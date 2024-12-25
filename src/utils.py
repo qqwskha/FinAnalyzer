@@ -1,39 +1,60 @@
-import requests
+# src/utils.py
+
 import pandas as pd
-from datetime import datetime
+import datetime
+import os
+import logging
+from typing import Union
 
-def get_greeting(date: datetime) -> str:
-    """Возвращает приветствие в зависимости от времени суток."""
-    if 5 <= date.hour < 12:
-        return "Доброе утро"
-    elif 12 <= date.hour < 18:
-        return "Добрый день"
-    elif 18 <= date.hour < 23:
-        return "Добрый вечер"
+# Логирование
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+# 📆 Функция для получения диапазона дат за последние 3 месяца
+def get_last_three_months_range(date: Union[str, None] = None) -> tuple:
+    """
+    Возвращает диапазон дат за последние 3 месяца от переданной даты или текущей даты.
+
+    :param date: Строка с датой в формате 'YYYY-MM-DD'. Если None, берется текущая дата.
+    :return: Кортеж с начальной и конечной датами.
+    """
+    if date:
+        current_date = pd.to_datetime(date)
     else:
-        return "Доброй ночи"
+        current_date = pd.Timestamp.now()
 
-def fetch_currency_rates() -> list:
-    """Получает текущие курсы валют с API."""
-    try:
-        response = requests.get("https://api.exchangeratesapi.io/latest")
-        response.raise_for_status()
-        data = response.json()
-        return [{"currency": key, "rate": value} for key, value in data['rates'].items()]
-    except requests.exceptions.RequestException as e:
-        print(f"Ошибка при получении курсов валют: {e}")
-        return []
+    start_date = current_date - pd.DateOffset(months=3)
+    return start_date, current_date
 
-def fetch_stock_prices() -> list:
-    """Возвращает фиктивные цены акций."""
-    return [
-        {"stock": "AAPL", "price": 150.12},
-        {"stock": "AMZN", "price": 3173.18},
-        {"stock": "GOOGL", "price": 2742.39},
-        {"stock": "MSFT", "price": 296.71},
-        {"stock": "TSLA", "price": 1007.08}
-    ]
 
-def load_transactions(file_path: str) -> pd.DataFrame:
-    """Загружает транзакции из Excel-файла."""
-    return pd.read_excel(file_path)
+# 🛡️ Функция для проверки и преобразования столбца с датами
+def ensure_datetime_column(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """
+    Проверяет и преобразует указанный столбец в datetime.
+
+    :param df: DataFrame с данными.
+    :param column: Название столбца для преобразования.
+    :return: DataFrame с преобразованным столбцом.
+    """
+    if column in df.columns:
+        df[column] = pd.to_datetime(df[column], errors='coerce')
+        logger.info(f"Столбец '{column}' преобразован в datetime.")
+    else:
+        logger.error(f"Столбец '{column}' не найден в DataFrame.")
+        raise KeyError(f"Столбец '{column}' не найден.")
+    return df
+
+
+# 📁 Функция для создания папки, если её нет
+def ensure_directory_exists(path: str):
+    """
+    Проверяет, существует ли папка, и создает её, если она отсутствует.
+
+    :param path: Путь к папке.
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+        logger.info(f"Папка создана: {path}")
+    else:
+        logger.info(f"Папка уже существует: {path}")
