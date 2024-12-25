@@ -4,6 +4,8 @@ import logging
 from typing import Optional, Callable
 import os
 
+from src.utils import get_last_three_months_range, ensure_datetime_column
+
 # Логирование
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,17 +43,9 @@ def save_report(file_name: Optional[str] = None):
 # 📊 Траты по категории
 @save_report()
 def spending_by_category(transactions: pd.DataFrame, category: str, date: Optional[str] = None) -> pd.DataFrame:
-    """
-    Возвращает траты по указанной категории за последние 3 месяца.
-    """
-    if date:
-        current_date = pd.to_datetime(date)
-    else:
-        current_date = pd.Timestamp.now()
+    start_date, current_date = get_last_three_months_range(date)
+    transactions = ensure_datetime_column(transactions, 'Дата операции')
 
-    start_date = current_date - pd.DateOffset(months=3)
-
-    transactions['Дата операции'] = pd.to_datetime(transactions['Дата операции'])
     filtered_data = transactions[
         (transactions['Категория'] == category) &
         (transactions['Дата операции'] >= start_date) &
