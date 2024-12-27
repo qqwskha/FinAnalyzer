@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import datetime
 import logging
 import re
@@ -9,46 +9,33 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 #  Анализ выгодных категорий повышенного кешбэка
-def analyze_cashback_categories(data: pd.DataFrame, year: int, month: int) -> Dict[str, float]:
+def analyze_cashback_categories(data: pd.DataFrame, year: Optional[int] = None, month: Optional[int] = None) -> Dict[str, float]:
     """
     Анализ выгодных категорий повышенного кешбэка.
     """
-    # Преобразование строковых дат в datetime с учетом формата
-    try:
-        data['Дата операции'] = pd.to_datetime(
-            data['Дата операции'],
-            format='%d.%m.%Y %H:%M:%S',
-            errors='coerce',
-            dayfirst=True
-        )
-    except Exception as e:
-        logger.error(f"Ошибка при преобразовании дат: {e}")
-        return {}
+    # Указать формат и установить dayfirst=True, если даты в формате дд.мм.гггг
+    data['Дата операции'] = pd.to_datetime(data['Дата операции'], format='%d.%m.%Y %H:%M:%S', errors='coerce', dayfirst=True)
 
-    # Проверка наличия корректных дат
-    if data['Дата операции'].isnull().all():
-        logger.warning("Все даты некорректны после преобразования.")
-        return {}
+    if year and month:
+        # Анализ за месяц и год
+        filtered_data = data[
+            (data['Дата операции'].dt.year == year) &
+            (data['Дата операции'].dt.month == month)
+        ]
+    else:
+        # Анализ за предоставленный диапазон дат (если фильтрация уже сделана)
+        filtered_data = data
 
-    # Фильтрация данных по году и месяцу
-    filtered_data = data[
-        (data['Дата операции'].dt.year == year) &
-        (data['Дата операции'].dt.month == month)
-    ]
-
-    # Проверка на пустой результат
     if filtered_data.empty:
-        logger.warning(f"Нет транзакций за {year}-{month} для анализа кешбэка.")
         return {}
 
-    # Группировка по категориям и расчет кешбэка
     cashback_by_category = (
         filtered_data.groupby('Категория')['Кэшбэк']
         .sum()
         .sort_values(ascending=False)
-    )
+    ).to_dict()
 
-    return cashback_by_category.to_dict()
+    return cashback_by_category
 
 # 🏦 Инвесткопилка
 def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) -> float:
