@@ -1,5 +1,7 @@
-from src.views import main_page_view
 import json
+
+from src.views import main_page_view
+
 
 def test_main_page_view():
     response = main_page_view("2024-06-25 12:00:00")

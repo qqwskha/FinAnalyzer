@@ -1,5 +1,6 @@
 from src.services import cashback_categories
 
+
 def test_cashback_categories():
     transactions = [
         {"Дата операции": "2024-06-01", "Категория": "Супермаркеты", "Сумма операции": 1000},

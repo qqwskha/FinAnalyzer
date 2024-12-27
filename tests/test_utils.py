@@ -1,5 +1,7 @@
-from src.utils import get_greeting
 from datetime import datetime
+
+from src.utils import get_greeting
+
 
 def test_get_greeting():
     assert get_greeting(datetime(2024, 6, 25, 8)) == "Доброе утро"

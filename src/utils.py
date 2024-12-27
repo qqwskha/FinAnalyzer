@@ -84,3 +84,18 @@ def filter_transactions_by_category(df: pd.DataFrame, category: str) -> pd.DataF
     filtered_df = df[df['Категория'] == category]
     logger.info(f"Отфильтровано {len(filtered_df)} транзакций по категории: {category}")
     return filtered_df
+
+
+def load_transactions(file_path: str) -> pd.DataFrame:
+    """
+    Загружает данные о транзакциях из Excel-файла.
+    """
+    return pd.read_excel(file_path)
+
+
+def save_json():
+    pass
+
+
+def configure_logging():
+    pass
