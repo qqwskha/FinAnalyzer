@@ -42,16 +42,25 @@ def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) 
     """
     Рассчитывает сумму, которую можно было бы отложить в «Инвесткопилку».
     """
-    month_date = datetime.datetime.strptime(month, "%Y-%m")  # Преобразуем месяц в datetime
+    # Преобразуем строку месяца в datetime
+    month_date = datetime.datetime.strptime(month, "%Y-%m")
 
-    # Фильтрация транзакций по месяцу
+    # Преобразуем даты операций в транзакциях в datetime
+    for txn in transactions:
+        txn['Дата операции'] = pd.to_datetime(txn['Дата операции'], errors='coerce')
+
+    # Фильтруем транзакции по месяцу
     filtered_transactions = [
         txn for txn in transactions
-        if pd.to_datetime(txn['Дата операции']).year == month_date.year and  # Используем pd.to_datetime
-           pd.to_datetime(txn['Дата операции']).month == month_date.month  # Для извлечения года и месяца
+        if txn['Дата операции'].year == month_date.year and
+           txn['Дата операции'].month == month_date.month
     ]
 
-    # Рассчет округления
+    # Логирование для отладки
+    logger.info(f"Month: {month_date}")
+    logger.info(f"Filtered Transactions: {filtered_transactions}")
+
+    # Рассчитываем общую сумму, которую можно отложить
     total_saved = sum(
         (limit - (txn['Сумма операции'] % limit)) % limit
         for txn in filtered_transactions
