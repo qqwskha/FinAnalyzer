@@ -1,14 +1,11 @@
 import datetime
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
-from src.services import (
-    analyze_cashback_categories,
-    investment_bank,
-    simple_search,
-    search_phone_numbers,
-    search_personal_transfers,
-)
+import pytest
+
+from src.services import (analyze_cashback_categories, investment_bank, search_personal_transfers,
+                          search_phone_numbers, simple_search)
 
 
 @pytest.fixture

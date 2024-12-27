@@ -1,11 +1,12 @@
 # src/views.py
 
-import pandas as pd
 import datetime
 import json
-import requests
 import logging
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
+import pandas as pd
+import requests
 
 # Логирование
 logging.basicConfig(level=logging.INFO)

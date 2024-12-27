@@ -1,15 +1,12 @@
-import pytest
-import pandas as pd
-import os
 import datetime
+import os
 from unittest.mock import patch
-from src.utils import (
-    get_last_three_months_range,
-    ensure_datetime_column,
-    ensure_directory_exists,
-    calculate_cashback,
-    filter_transactions_by_category
-)
+
+import pandas as pd
+import pytest
+
+from src.utils import (calculate_cashback, ensure_datetime_column, ensure_directory_exists,
+                       filter_transactions_by_category, get_last_three_months_range)
 
 
 # Тест для функции get_last_three_months_range

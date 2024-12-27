@@ -1,8 +1,9 @@
-import pandas as pd
 import datetime
-import os
 import logging
-from typing import Union, Optional
+import os
+from typing import Optional, Union
+
+import pandas as pd
 
 # Логирование
 logging.basicConfig(level=logging.INFO)

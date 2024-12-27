@@ -1,7 +1,10 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
+import pytest
+
 from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
+
 
 @pytest.fixture
 def transactions_mock():

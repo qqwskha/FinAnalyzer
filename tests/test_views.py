@@ -1,8 +1,10 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pandas as pd
-from src.views import get_greeting, get_card_summary, get_top_transactions, get_currency_rates, get_stock_prices, \
-    generate_main_page_response
+import pytest
+
+from src.views import (generate_main_page_response, get_card_summary, get_currency_rates, get_greeting,
+                       get_stock_prices, get_top_transactions)
 
 
 # Тестирование функции get_greeting

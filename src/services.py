@@ -1,8 +1,9 @@
-import pandas as pd
-from typing import Dict, List, Any, Optional
 import datetime
 import logging
 import re
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 # Логирование
 logging.basicConfig(level=logging.INFO)

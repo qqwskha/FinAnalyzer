@@ -1,5 +1,7 @@
-import pandas as pd
 import logging
+
+import pandas as pd
+
 from services import analyze_cashback_categories
 from utils import load_transactions
 

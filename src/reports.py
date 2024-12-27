@@ -1,10 +1,11 @@
-import pandas as pd
 import datetime
 import logging
-from typing import Optional, Callable
 import os
+from typing import Callable, Optional
 
-from src.utils import get_last_three_months_range, ensure_datetime_column
+import pandas as pd
+
+from src.utils import ensure_datetime_column, get_last_three_months_range
 
 # Логирование
 logging.basicConfig(level=logging.INFO)
