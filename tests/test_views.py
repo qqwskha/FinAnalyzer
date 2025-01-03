@@ -1,14 +1,14 @@
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 
 from src.views import (generate_main_page_response, get_card_summary, get_currency_rates, get_greeting,
                        get_stock_prices, get_top_transactions)
 
 
 # Тестирование функции get_greeting
-def test_get_greeting():
+def test_get_greeting() -> None:
+    """Тестирование функции get_greeting."""
     assert get_greeting("2023-12-27 08:00:00") == "Доброе утро"
     assert get_greeting("2023-12-27 14:00:00") == "Добрый день"
     assert get_greeting("2023-12-27 19:00:00") == "Добрый вечер"
@@ -16,7 +16,8 @@ def test_get_greeting():
 
 
 # Тестирование функции get_card_summary
-def test_get_card_summary():
+def test_get_card_summary() -> None:
+    """Тестирование функции get_card_summary."""
     transactions = pd.DataFrame({
         'Номер карты': [1234567890123456, 1234567890123456, 9876543210987654],
         'Сумма платежа': [500, 300, 700]
@@ -40,11 +41,12 @@ def test_get_card_summary():
         for card in result
     ]
 
-    assert result == result
+    assert result == expected_result
 
 
 # Тестирование функции get_top_transactions
-def test_get_top_transactions():
+def test_get_top_transactions() -> None:
+    """Тестирование функции get_top_transactions."""
     transactions = pd.DataFrame({
         'Дата операции': ['2023-12-25 12:00:00', '2023-12-26 12:00:00', '2023-12-27 12:00:00'],
         'Сумма платежа': [500, 1000, 200],
@@ -63,7 +65,8 @@ def test_get_top_transactions():
 
 # Тестирование функции get_currency_rates с использованием mock
 @patch('requests.get')
-def test_get_currency_rates(mock_get):
+def test_get_currency_rates(mock_get: MagicMock) -> None:
+    """Тестирование функции get_currency_rates с использованием mock."""
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -82,7 +85,8 @@ def test_get_currency_rates(mock_get):
 
 # Тестирование функции get_stock_prices с использованием mock
 @patch('requests.get')
-def test_get_stock_prices(mock_get):
+def test_get_stock_prices(mock_get: MagicMock) -> None:
+    """Тестирование функции get_stock_prices с использованием mock."""
     stock_list = ["AAPL", "GOOGL"]
 
     # Mocking response for AAPL
@@ -108,7 +112,8 @@ def test_get_stock_prices(mock_get):
 
 # Тестирование функции generate_main_page_response
 @patch('requests.get')
-def test_generate_main_page_response(mock_get):
+def test_generate_main_page_response(mock_get: MagicMock) -> None:
+    """Тестирование функции generate_main_page_response с использованием mock."""
     # Mock responses for currency rates and stock prices
     mock_response_currency = MagicMock()
     mock_response_currency.status_code = 200
@@ -165,7 +170,4 @@ def test_generate_main_page_response(mock_get):
         for card in result["cards"]
     ]
 
-    assert result == result
-
-
-
+    assert result == expected_result

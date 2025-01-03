@@ -2,15 +2,16 @@ import logging
 
 import pandas as pd
 
-from services import analyze_cashback_categories
-from utils import load_transactions
+from src.services import analyze_cashback_categories
+from src.utils import load_transactions
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
+    """Основная функция приложения для анализа кешбэка."""
     logger.info("Запуск приложения...")
 
     try:
@@ -34,7 +35,7 @@ def main():
 
         cashback_result = analyze_cashback_categories(transactions, year=year, month=month)
         if cashback_result:
-            print("📊 Анализ кешбэка за выбранный месяц:")
+            print("Анализ кешбэка за выбранный месяц:")
             print(cashback_result)
         else:
             logger.warning("Нет данных для анализа кешбэка за указанный месяц и год.")
@@ -44,19 +45,19 @@ def main():
         end_date = input("Введите конечную дату (YYYY-MM-DD): ").strip()
 
         transactions['Дата операции'] = pd.to_datetime(transactions['Дата операции'], errors='coerce')
-        filtered_data = transactions[
-            (transactions['Дата операции'] >= pd.to_datetime(start_date)) &
+        filtered_data = transactions[(
+            transactions['Дата операции'] >= pd.to_datetime(start_date)) &
             (transactions['Дата операции'] <= pd.to_datetime(end_date))
-            ]
+        ]
 
         cashback_result = analyze_cashback_categories(filtered_data, year=None, month=None)
         if cashback_result:
-            print("📊 Анализ кешбэка за выбранный диапазон:")
+            print("Анализ кешбэка за выбранный диапазон:")
             print(cashback_result)
         else:
             logger.warning("Нет данных для анализа кешбэка за указанный диапазон дат.")
     else:
-        print("❌ Некорректный ввод. Попробуйте снова.")
+        print("Некорректный ввод. Попробуйте снова.")
 
     logger.info("Завершение работы приложения.")
 

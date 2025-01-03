@@ -1,6 +1,5 @@
 import datetime
 import logging
-import re
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -9,13 +8,16 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 #  Анализ выгодных категорий повышенного кешбэка
-def analyze_cashback_categories(data: pd.DataFrame, year: Optional[int] = None, month: Optional[int] = None) -> Dict[str, float]:
+def analyze_cashback_categories(data: pd.DataFrame, year: Optional[int] = None,
+                                month: Optional[int] = None) -> Dict[str, float]:
     """
     Анализ выгодных категорий повышенного кешбэка.
     """
     # Указать формат и установить dayfirst=True, если даты в формате дд.мм.гггг
-    data['Дата операции'] = pd.to_datetime(data['Дата операции'], format='%d.%m.%Y %H:%M:%S', errors='coerce', dayfirst=True)
+    data['Дата операции'] = pd.to_datetime(data['Дата операции'],
+                                           format='%d.%m.%Y %H:%M:%S', errors='coerce', dayfirst=True)
 
     if year and month:
         # Анализ за месяц и год
@@ -38,7 +40,8 @@ def analyze_cashback_categories(data: pd.DataFrame, year: Optional[int] = None, 
 
     return cashback_by_category
 
-# 🏦 Инвесткопилка
+
+# Инвесткопилка
 def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) -> float:
     """
     Рассчитывает сумму, которую можно было бы отложить в «Инвесткопилку».
@@ -54,7 +57,7 @@ def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) 
     filtered_transactions = [
         txn for txn in transactions
         if txn['Дата операции'].year == month_date.year and
-           txn['Дата операции'].month == month_date.month
+        txn['Дата операции'].month == month_date.month
     ]
 
     # Логирование для отладки
@@ -67,10 +70,10 @@ def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) 
         for txn in filtered_transactions
     )
 
-    return total_saved
+    return float(total_saved)  # Убедитесь, что возвращаете float
 
 
-# 🔍 Простой поиск
+# Простой поиск
 def simple_search(transactions: pd.DataFrame, query: str) -> List[Dict[str, Any]]:
     """
     Ищет транзакции по описанию или категории.
@@ -80,10 +83,13 @@ def simple_search(transactions: pd.DataFrame, query: str) -> List[Dict[str, Any]
         transactions['Категория'].str.contains(query, case=False, na=False)
     ]
 
-    return filtered_transactions.to_dict('records')
+    return [
+        {str(key): value for key, value in txn.items()}
+        for txn in filtered_transactions.to_dict('records')
+    ]
 
 
-# 📱 Поиск по телефонным номерам
+# Поиск по телефонным номерам
 def search_phone_numbers(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
     """
     Ищет транзакции с мобильными номерами в описании.
@@ -93,10 +99,13 @@ def search_phone_numbers(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
         transactions['Описание'].str.contains(phone_pattern, regex=True, na=False)
     ]
 
-    return filtered_transactions.to_dict('records')
+    return [
+        {str(key): value for key, value in txn.items()}
+        for txn in filtered_transactions.to_dict('records')
+    ]
 
 
-# 👤 Поиск переводов физическим лицам
+# Поиск переводов физическим лицам
 def search_personal_transfers(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
     """
     Ищет транзакции, относящиеся к переводам физическим лицам.
@@ -106,4 +115,7 @@ def search_personal_transfers(transactions: pd.DataFrame) -> List[Dict[str, Any]
         transactions['Описание'].str.contains(r'\b[A-ЯЁ][а-яё]+\s[A-ЯЁ]\.', regex=True, na=False)
     ]
 
-    return filtered_transactions.to_dict('records')
+    return [
+        {str(key): value for key, value in txn.items()}
+        for txn in filtered_transactions.to_dict('records')
+    ]

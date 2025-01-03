@@ -12,15 +12,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# 📁 Декоратор для сохранения отчетов в файл
-def save_report(file_name: Optional[str] = None):
+# Декоратор для сохранения отчетов в файл
+def save_report(file_name: Optional[str] = None) -> Callable[[Callable[..., pd.DataFrame]], Callable[..., pd.DataFrame]]:
     """
     Декоратор для сохранения отчета в файл.
     Если имя файла не указано, используется имя по умолчанию.
     """
 
-    def decorator(func: Callable):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Callable[..., pd.DataFrame]) -> Callable[..., pd.DataFrame]:
+        def wrapper(*args: tuple, **kwargs: dict) -> pd.DataFrame:
             result = func(*args, **kwargs)
             nonlocal file_name
             if not file_name:
@@ -41,25 +41,32 @@ def save_report(file_name: Optional[str] = None):
     return decorator
 
 
-# 📊 Траты по категории
+# Траты по категории
 @save_report()
-def spending_by_category(transactions: pd.DataFrame, category: str, date: Optional[str] = None) -> pd.DataFrame:
+def spending_by_category(
+        transactions: pd.DataFrame,
+        category: str,
+        date: Optional[str] = None
+) -> pd.DataFrame:
+    """
+    Возвращает отчет о тратах по категории за последние 3 месяца.
+    """
     start_date, current_date = get_last_three_months_range(date)
     transactions = ensure_datetime_column(transactions, 'Дата операции')
-
-    filtered_data = transactions[
+    filtered_transactions = transactions[
         (transactions['Категория'] == category) &
         (transactions['Дата операции'] >= start_date) &
         (transactions['Дата операции'] <= current_date)
-        ]
-
-    report = filtered_data[['Дата операции', 'Сумма операции', 'Описание']]
-    return report
+    ]
+    return filtered_transactions
 
 
-# 📅 Траты по дням недели
+# Траты по дням недели
 @save_report()
-def spending_by_weekday(transactions: pd.DataFrame, date: Optional[str] = None) -> pd.DataFrame:
+def spending_by_weekday(
+    transactions: pd.DataFrame,
+    date: Optional[str] = None
+) -> pd.DataFrame:
     """
     Возвращает средние траты по дням недели за последние 3 месяца.
     """
@@ -74,7 +81,7 @@ def spending_by_weekday(transactions: pd.DataFrame, date: Optional[str] = None) 
     filtered_data = transactions[
         (transactions['Дата операции'] >= start_date) &
         (transactions['Дата операции'] <= current_date)
-        ]
+    ]
 
     filtered_data['День недели'] = filtered_data['Дата операции'].dt.day_name()
     report = (
@@ -86,9 +93,12 @@ def spending_by_weekday(transactions: pd.DataFrame, date: Optional[str] = None) 
     return report
 
 
-# 📆 Траты в рабочий/выходной день
+# Траты в рабочий/выходной день
 @save_report()
-def spending_by_workday(transactions: pd.DataFrame, date: Optional[str] = None) -> pd.DataFrame:
+def spending_by_workday(
+    transactions: pd.DataFrame,
+    date: Optional[str] = None
+) -> pd.DataFrame:
     """
     Возвращает средние траты в рабочие и выходные дни за последние 3 месяца.
     """
@@ -103,7 +113,7 @@ def spending_by_workday(transactions: pd.DataFrame, date: Optional[str] = None) 
     filtered_data = transactions[
         (transactions['Дата операции'] >= start_date) &
         (transactions['Дата операции'] <= current_date)
-        ]
+    ]
 
     filtered_data['Тип дня'] = filtered_data['Дата операции'].dt.dayofweek.apply(
         lambda x: 'Рабочий день' if x < 5 else 'Выходной день'

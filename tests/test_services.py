@@ -1,5 +1,5 @@
-import datetime
-from unittest.mock import MagicMock, patch
+from typing import Any, Dict, List
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -9,7 +9,7 @@ from src.services import (analyze_cashback_categories, investment_bank, search_p
 
 
 @pytest.fixture
-def transactions_mock():
+def transactions_mock() -> pd.DataFrame:
     """Пример тестового DataFrame с данными о транзакциях."""
     data = {
         'Дата операции': ['2023-01-01', '2023-01-15', '2023-02-10', '2023-03-01'],
@@ -27,7 +27,7 @@ def transactions_mock():
 
 
 @patch("pandas.to_datetime", side_effect=pd.to_datetime)
-def test_analyze_cashback_categories(mock_to_datetime):
+def test_analyze_cashback_categories(mock_to_datetime: Any) -> None:
     """Тестирование analyze_cashback_categories с mock."""
     transactions_mock = pd.DataFrame({
         'Дата операции': ['01.01.2023 12:00:00', '15.01.2023 15:30:00', '01.02.2023 18:00:00'],
@@ -41,9 +41,9 @@ def test_analyze_cashback_categories(mock_to_datetime):
     assert result == {'Еда': 50, 'Транспорт': 20}
 
 
-def test_investment_bank():
+def test_investment_bank() -> None:
     """Тестирование investment_bank без моков."""
-    transactions = [
+    transactions: List[Dict[str, Any]] = [
         {'Дата операции': '2023-01-01 12:00:00', 'Сумма операции': 512},
         {'Дата операции': '2023-01-15 15:30:00', 'Сумма операции': 490},
         {'Дата операции': '2023-02-10 18:00:00', 'Сумма операции': 775}
@@ -52,9 +52,8 @@ def test_investment_bank():
     assert result == 98  # (100 - 12) + (100 - 90)
 
 
-
 @patch("src.services.pd.DataFrame.to_dict")
-def test_simple_search(mock_to_dict, transactions_mock):
+def test_simple_search(mock_to_dict: Any, transactions_mock: pd.DataFrame) -> None:
     """Тестирование simple_search с mock."""
     mock_to_dict.return_value = [
         {'Дата операции': '2023-01-01', 'Описание': 'Кафе', 'Категория': 'Еда'}
@@ -66,7 +65,7 @@ def test_simple_search(mock_to_dict, transactions_mock):
 
 
 @patch("src.services.pd.DataFrame.to_dict")
-def test_search_phone_numbers(mock_to_dict):
+def test_search_phone_numbers(mock_to_dict: Any) -> None:
     """Тестирование search_phone_numbers с mock."""
     mock_to_dict.return_value = [
         {'Дата операции': '2023-01-01', 'Описание': 'Пополнение телефона +7 123 456-78-90'}
@@ -85,7 +84,7 @@ def test_search_phone_numbers(mock_to_dict):
 
 
 @patch("src.services.pd.DataFrame.to_dict")
-def test_search_personal_transfers(mock_to_dict, transactions_mock):
+def test_search_personal_transfers(mock_to_dict: Any, transactions_mock: pd.DataFrame) -> None:
     """Тестирование search_personal_transfers с mock."""
     mock_to_dict.return_value = [
         {'Дата операции': '2023-03-01', 'Описание': 'Иванов И.П. перевод средств'}

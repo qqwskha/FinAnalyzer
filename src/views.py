@@ -1,7 +1,3 @@
-# src/views.py
-
-import datetime
-import json
 import logging
 from typing import Any, Dict, List
 
@@ -28,19 +24,19 @@ def get_greeting(current_time: str) -> str:
 
 # Суммирование трат и кешбэка по картам
 def get_card_summary(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
-    summary = transactions.groupby('Номер карты').agg(
-        total_spent=('Сумма платежа', 'sum'),
-        cashback=('Сумма платежа', lambda x: x.sum() * 0.01)
-    ).reset_index()
-
-    return [
-        {
-            "last_digits": str(row['Номер карты'])[-4:],
-            "total_spent": round(row['total_spent'], 2),
-            "cashback": round(row['cashback'], 2)
-        }
-        for _, row in summary.iterrows()
-    ]
+    """Возвращает сводку по картам: последние 4 цифры, сумма потраченных средств и кэшбэк."""
+    card_summary = []
+    for card in transactions['Номер карты'].unique():
+        card_transactions = transactions[transactions['Номер карты'] == card]
+        total_spent = card_transactions['Сумма платежа'].sum()
+        cashback = total_spent * 0.01  # 1% cashback
+        last_digits = str(card)[-4:]  # Extract last 4 digits as string
+        card_summary.append({
+            'last_digits': last_digits,
+            'total_spent': total_spent,
+            'cashback': cashback
+        })
+    return card_summary
 
 
 # Топ-5 транзакций по сумме платежа
@@ -85,8 +81,8 @@ def get_stock_prices(stocks: List[str]) -> List[Dict[str, Any]]:
 
 
 # Главная функция
-def generate_main_page_response(transactions: pd.DataFrame, current_time: str, user_settings: Dict[str, Any]) -> Dict[
-    str, Any]:
+def generate_main_page_response(transactions: pd.DataFrame, current_time: str,
+                                user_settings: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "greeting": get_greeting(current_time),
         "cards": get_card_summary(transactions),

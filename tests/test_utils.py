@@ -1,6 +1,4 @@
-import datetime
-import os
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
@@ -10,7 +8,7 @@ from src.utils import (calculate_cashback, ensure_datetime_column, ensure_direct
 
 
 # Тест для функции get_last_three_months_range
-def test_get_last_three_months_range():
+def test_get_last_three_months_range() -> None:
     """Тестирование функции получения диапазона дат за последние 3 месяца."""
 
     # Тест с переданной датой
@@ -20,15 +18,17 @@ def test_get_last_three_months_range():
     assert end_date == pd.Timestamp("2023-12-01")
 
     # Тест без передачи даты (по умолчанию текущая дата)
-    end_date = pd.Timestamp.now()
+    end_date = pd.Timestamp.now().normalize()  # Нормализуем дату, устанавливая время на 00:00:00
     start_date = end_date - pd.DateOffset(months=3)
     start_date_func, end_date_func = get_last_three_months_range()
+
+    # Сравниваем нормализованные значения
     assert start_date_func == start_date
     assert end_date_func == end_date
 
 
 # Тест для функции ensure_datetime_column
-def test_ensure_datetime_column():
+def test_ensure_datetime_column() -> None:
     """Тестирование преобразования столбца в datetime."""
 
     # Создаем тестовый DataFrame
@@ -48,7 +48,7 @@ def test_ensure_datetime_column():
 
 # Тест для функции ensure_directory_exists
 @patch("os.makedirs")
-def test_ensure_directory_exists(mock_makedirs):
+def test_ensure_directory_exists(mock_makedirs: MagicMock) -> None:
     """Тестирование создания папки, если её нет."""
 
     path = 'test_folder'
@@ -60,8 +60,9 @@ def test_ensure_directory_exists(mock_makedirs):
     # Проверяем, что os.makedirs был вызван только 1 раз
     mock_makedirs.assert_called_once_with(path)
 
+
 # Тест для функции calculate_cashback
-def test_calculate_cashback():
+def test_calculate_cashback() -> None:
     """Тестирование расчета кешбэка."""
 
     # Простой тест с обычной суммой
@@ -78,7 +79,7 @@ def test_calculate_cashback():
 
 
 # Тест для функции filter_transactions_by_category
-def test_filter_transactions_by_category():
+def test_filter_transactions_by_category() -> None:
     """Тестирование фильтрации транзакций по категории."""
 
     # Создаем тестовый DataFrame
@@ -97,4 +98,3 @@ def test_filter_transactions_by_category():
     # Проверяем, что в результате остались только транзакции категории "Еда"
     assert len(result_df) == 2
     assert all(result_df['Категория'] == "Еда")
-
