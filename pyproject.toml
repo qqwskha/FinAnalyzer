@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "pythonproject"
+version = "0.1.0"
+description = ""
+authors = ["Danil <fofogogo12345689@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+reports = "^0.4.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+exclude = '''
+    /(
+        \.git
+    )/
+'''
+
+[tool.isort]
+line_length = 119
+
+[tool.mypy]
+disallow_untyped_defs = true
+warn_return_any = true
+exclude = '^venv'
+
+
