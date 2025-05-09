@@ -1,1 +1,1 @@
-# coursework
+# FinAnalyzer
